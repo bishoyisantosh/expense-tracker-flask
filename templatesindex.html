@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Expense Tracker</h1>
+
+    <form method="POST">
+      <input type="text" name="category" placeholder="Enter category" required>
+      <input type="number" step="0.01" name="amount" placeholder="Enter amount" required>
+      <button type="submit">Add Expense</button>
+    </form>
+
+    <h3>Total Spent: ₹{{ total }}</h3>
+
+    <ul>
+      {% for exp in expenses %}
+        <li>{{ exp.category }} - ₹{{ exp.amount }}
+          <a href="/delete/{{ loop.index0 }}">Delete</a>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script>
+    const data = {
+      labels: {{ expenses | map(attribute='category') | list | tojson }},
+      datasets: [{
+        label: 'Expenses',
+        data: {{ expenses | map(attribute='amount') | list | tojson }},
+        backgroundColor: ['#0ea5e9','#22c55e','#ef4444','#facc15','#8b5cf6']
+      }]
+    };
+
+    const config = {
+      type: 'pie',
+      data: data,
+    };
+
+    new Chart(
+      document.getElementById('chart'),
+      config
+    );
+  </script>
+</body>
+</html>
